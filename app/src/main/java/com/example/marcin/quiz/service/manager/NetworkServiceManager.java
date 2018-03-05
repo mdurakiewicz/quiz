@@ -90,14 +90,6 @@ public class NetworkServiceManager {
                     @Override public void onNext(QuizzesData quizzesData) {
                         Log.d(TAG, "In onNext()");
 
-
-                        /*for(int i = 0; i < 1000000; i++){
-                            Log.d(TAG, "7777777777777777777777777777777777777777777777777777)");
-                        }*/
-
-                        //quizViewDataList = getQuizViewDataFromDb(quizDBHelper);
-                        //quizListAdapter.setQuizList(quizViewDataList);
-
                         final QuizRepositoryImpl quizRepository = new QuizRepositoryImpl(quizDBHelper);
 
                         List<Quiz> quizList = getQuizListFromQuizzezData(quizzesData);
@@ -108,12 +100,6 @@ public class NetworkServiceManager {
 
                         quizViewDataList = getQuizViewDataFromDb(quizDBHelper);
                         quizListAdapter.setQuizList(quizViewDataList);
-
-
-                        Log.d(TAG, "------------------------------");
-                        Log.d(TAG, quizViewDataList.toString());
-                        Log.d(TAG, "------------------------------");
-
 
                         List<Observable<QuizDetailsData>> obsList = new ArrayList<>();
                         for(QuizViewData quizViewData : quizViewDataList){
