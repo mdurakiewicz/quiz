@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="#f1f1f1">
+
+    <TextView
+        android:id="@+id/txtv_result"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="80dp"
+        android:layout_marginLeft="70dp"
+        android:layout_marginRight="70dp"
+        android:gravity="center"
+        android:layout_centerHorizontal="true"
+        android:textColor="#1f7f5f"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        android:typeface="sans"
+        android:text="Odpowiedziałeś poprawnie na 90% pytań!" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="120dp"
+        android:layout_below="@+id/txtv_result"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="40dp"
+        android:orientation="horizontal"
+        android:layout_gravity="center_horizontal">
+
+        <Button
+            android:id="@+id/btn_go_to_quiz_list"
+            android:background="@drawable/summary_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginTop="30dp"
+            android:layout_marginBottom="10dp"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="15dp"
+            android:textColor="#f1f1f1"
+            android:typeface="sans"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:text="Przejdź do listy quizów" />
+
+        <Button
+            android:id="@+id/btn_go_to_quiz_beginning"
+            android:background="@drawable/summary_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginTop="30dp"
+            android:layout_marginBottom="10dp"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="30dp"
+            android:textColor="#f1f1f1"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:typeface="sans"
+            android:text="Rozwiąż jeszcze raz" />
+    </LinearLayout>
+
+</RelativeLayout>
