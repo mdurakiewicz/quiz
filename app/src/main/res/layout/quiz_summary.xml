@@ -13,11 +13,11 @@
         android:layout_marginRight="70dp"
         android:gravity="center"
         android:layout_centerHorizontal="true"
-        android:textColor="#1f7f5f"
+        android:textColor="@color/titleTextSummary"
         android:textSize="15sp"
         android:textStyle="bold"
         android:typeface="sans"
-        android:text="Odpowiedziałeś poprawnie na 90% pytań!" />
+        android:text="@string/lorem_ipsum" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -38,13 +38,13 @@
             android:layout_marginBottom="10dp"
             android:layout_marginLeft="30dp"
             android:layout_marginRight="15dp"
-            android:textColor="#f1f1f1"
+            android:textColor="@color/buttonTextSummary"
             android:typeface="sans"
             android:paddingTop="5dp"
             android:paddingBottom="5dp"
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
-            android:text="Przejdź do listy quizów" />
+            android:text="@string/textButtonGoToQuizListSummary" />
 
         <Button
             android:id="@+id/btn_go_to_quiz_beginning"
@@ -56,13 +56,13 @@
             android:layout_marginBottom="10dp"
             android:layout_marginLeft="15dp"
             android:layout_marginRight="30dp"
-            android:textColor="#f1f1f1"
+            android:textColor="@color/buttonTextSummary"
             android:paddingTop="5dp"
             android:paddingBottom="5dp"
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
             android:typeface="sans"
-            android:text="Rozwiąż jeszcze raz" />
+            android:text="@string/textButtonGoToBeginningQuizSummary" />
     </LinearLayout>
 
 </RelativeLayout>

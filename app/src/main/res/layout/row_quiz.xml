@@ -15,8 +15,8 @@
         android:layout_marginRight="10dp"
         android:layout_marginTop="10dp"
         android:layout_marginBottom="10dp"
-        android:text="Tytuł quizu"
-        android:textColor="#1f1f1f"
+        android:text="@string/lorem_ipsum"
+        android:textColor="@color/titleTextListColor"
         android:textSize="15sp"
         android:textStyle="bold"
         android:typeface="sans" />
@@ -30,10 +30,10 @@
         android:layout_marginBottom="5dp"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
-        android:textColor="#2f2f2f"
+        android:textColor="@color/detailsTextListColor"
         android:textSize="14sp"
         android:layout_centerHorizontal="true"
-        android:text="Szczegóły" />
+        android:text="@string/lorem_ipsum" />
 
 
 </RelativeLayout>

@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.example.marcin.quiz.db.helper.QuizDBHelper;
 import com.example.marcin.quiz.db.model.Quiz;
@@ -39,9 +40,17 @@ public class MainActivity extends AppCompatActivity {
         quizListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                Intent intent = new Intent(MainActivity.this, QuestionPagerActivity.class);
-                intent.putExtra(QUIZ_NUMBER, position);
-                startActivity(intent);
+                List<QuizViewData> quizViewDataList = NetworkServiceManager.getQuizViewDataList();
+                quizViewDataList.get(position);
+
+                if(quizViewDataList.get(position).getQuestions() != null){
+                    Intent intent = new Intent(MainActivity.this, QuestionPagerActivity.class);
+                    intent.putExtra(QUIZ_NUMBER, position);
+                    startActivity(intent);
+                } else {
+                    Toast.makeText(getApplicationContext(), "Dane quizu \"" + quizViewDataList.get(position).getTitle() + "\" są obecnie niedostępne", Toast.LENGTH_SHORT).show();
+                }
+
             }
         });
 
@@ -51,9 +60,12 @@ public class MainActivity extends AppCompatActivity {
         quizListView.setAdapter(quizListAdapter);
 
         networkServiceManager = NetworkServiceManager.getInstance();
+        networkServiceManager.udateQuizViewDataFromDb(quizDBHelper);
 
-        List<QuizViewData> quizViewDataList = networkServiceManager.getQuizViewDataFromDb(quizDBHelper);
+        List<QuizViewData> quizViewDataList = NetworkServiceManager.getQuizViewDataList();
+
         quizListAdapter.setQuizList(quizViewDataList);
+        quizListAdapter.notifyDataSetChanged();
 
         networkServiceManager.getQuizzes(quizDBHelper, quizListAdapter);
 

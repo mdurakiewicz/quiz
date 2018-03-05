@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">quiz</string>
+    <string name="lorem_ipsum">Lorem ipsum</string>
+    <string name="textSummary">Odpowiedziałeś poprawnie na %d%% pytań</string>
+    <string name="textButtonGoToBeginningQuizSummary">Rozwiąż jeszcze raz</string>
+    <string name="textButtonGoToQuizListSummary">Przejdź do listy quizów</string>
 </resources>

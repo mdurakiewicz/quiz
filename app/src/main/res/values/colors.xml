@@ -3,4 +3,17 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+    <color name="titleTextListColor">#4071f9</color>
+    <color name="detailsTextListColor">#dee6fc</color>
+
+    <color name="rowListGradientStart">#dbeef9</color>
+    <color name="rowListGradientCenter">#8acdf7</color>
+    <color name="rowListGradientEnd">#66bef4</color>
+
+    <color name="buttonSummary">#66bef4</color>
+    <color name="buttonTextSummary">#f1f1f1</color>
+    <color name="titleTextQuestion">#1f7f5f</color>
+    <color name="titleTextSummary">#d8c81c</color>
+    <color name="textAnswer">#1f7f20</color>
+
 </resources>

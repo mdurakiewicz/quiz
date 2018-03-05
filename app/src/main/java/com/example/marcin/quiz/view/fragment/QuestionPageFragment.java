@@ -68,6 +68,7 @@ public class QuestionPageFragment extends Fragment {
             String answer = quizViewDataList.get(quizNumber).getQuestions().get(questionNumber).getAnswers().get(i).getText();
             RadioButton radioButton = new RadioButton(getContext());
             radioButton.setText(answer);
+            radioButton.setTextColor(getResources().getColor(R.color.textAnswer));
             radioGroup.addView(radioButton);
         }
 

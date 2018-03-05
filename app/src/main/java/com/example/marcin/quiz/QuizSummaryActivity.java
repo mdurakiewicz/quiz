@@ -24,7 +24,6 @@ public class QuizSummaryActivity extends AppCompatActivity {
     public static final String QUIZ_NUMBER = "com.example.marcin.quiz.QuizSummaryActivity.QUIZ_NUMBER";
 
     private static final int QUIZ_NUMBER_ARG_DEFAULT_VALUE = -1;
-    private static String QUIZ_RESULT_TEXT = "Odpowiedziałeś poprawnie na %d%% pytań";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,7 +40,8 @@ public class QuizSummaryActivity extends AppCompatActivity {
 
         if(quizNumber != QUIZ_NUMBER_ARG_DEFAULT_VALUE){
             int percent = (int) Math.floor((quizViewDataList.get(quizNumber).getCountOfCorrectAnswers() * 100) / quizViewDataList.get(quizNumber).getCountOfQuestions());
-            textViewResult.setText(String.format(QUIZ_RESULT_TEXT,percent));
+            textViewResult.setText(String.format(getResources().getString(R.string.textSummary),percent));
+
         } else {
             textViewResult.setText("");
         }

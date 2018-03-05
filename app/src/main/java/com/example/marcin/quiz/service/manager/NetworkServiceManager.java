@@ -28,9 +28,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import rx.Observable;
 import rx.Observer;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.FuncN;
 import rx.schedulers.Schedulers;
 
 /**
@@ -71,6 +73,10 @@ public class NetworkServiceManager {
         return quizDetailsSubscritpionList;
     }
 
+    public void udateQuizViewDataFromDb(QuizDBHelper quizDBHelper){
+        quizViewDataList = getQuizViewDataFromDb(quizDBHelper);
+    }
+
     public void getQuizzes(final QuizDBHelper quizDBHelper, final QuizListAdapter quizListAdapter) {
         quizzesSubscription = QuizzesClient.getInstance()
                 .getQuizzes()
@@ -84,7 +90,15 @@ public class NetworkServiceManager {
                     @Override public void onNext(QuizzesData quizzesData) {
                         Log.d(TAG, "In onNext()");
 
-                        QuizRepositoryImpl quizRepository = new QuizRepositoryImpl(quizDBHelper);
+
+                        /*for(int i = 0; i < 1000000; i++){
+                            Log.d(TAG, "7777777777777777777777777777777777777777777777777777)");
+                        }*/
+
+                        //quizViewDataList = getQuizViewDataFromDb(quizDBHelper);
+                        //quizListAdapter.setQuizList(quizViewDataList);
+
+                        final QuizRepositoryImpl quizRepository = new QuizRepositoryImpl(quizDBHelper);
 
                         List<Quiz> quizList = getQuizListFromQuizzezData(quizzesData);
                         List<Quiz> savedQuizList = quizRepository.getAll();
@@ -95,42 +109,126 @@ public class NetworkServiceManager {
                         quizViewDataList = getQuizViewDataFromDb(quizDBHelper);
                         quizListAdapter.setQuizList(quizViewDataList);
 
-                        List<Long> idList = new ArrayList<Long>();
+
+                        Log.d(TAG, "------------------------------");
+                        Log.d(TAG, quizViewDataList.toString());
+                        Log.d(TAG, "------------------------------");
+
+
+                        List<Observable<QuizDetailsData>> obsList = new ArrayList<>();
                         for(QuizViewData quizViewData : quizViewDataList){
                             if(quizViewData.getQuestions() == null){
-                                idList.add(quizViewData.getId());
+                                long id = quizViewData.getId();
+                                Observable<QuizDetailsData> observable = QuizClient.getInstance().getQuizDetails(id).subscribeOn(Schedulers.io());
+                                obsList.add(observable);
                             }
                         }
 
-                        for(Long id : idList){
-                            Subscription subscription = QuizClient.getInstance()
-                                .getQuizDetails(id)
-                                .subscribeOn(Schedulers.io())
-                                .observeOn(AndroidSchedulers.mainThread())
-                                .subscribe(new Observer<QuizDetailsData>() {
-                                    @Override public void onCompleted() {Log.d(TAG, "In onCompleted()");}
-                                    @Override public void onError(Throwable e) {Log.d(TAG, "In onError()");}
-                                    @Override
-                                    public void onNext(QuizDetailsData quizDetailsData) {
-                                        Log.d(TAG, "In onNext()");
+                        Observable z = Observable.zip(obsList, new FuncN() {
+                            @Override
+                            public List<QuizDetailsData> call(Object... args) {
+                                List<QuizDetailsData> quizDetailsDataList = new ArrayList<>();
 
-                                        for(QuizViewData quizViewData : quizViewDataList){
-                                            if(quizViewData.getId().equals(quizDetailsData.getId())){
-                                                quizViewData.setQuestions(insertQuestionAndAnswerData(quizDBHelper, quizDetailsData));
-                                            }
-                                        }
+                                for(Object obj : args){
+                                    QuizDetailsData quizDetailsData = (QuizDetailsData) obj;
+                                    quizDetailsDataList.add(quizDetailsData);
+                                }
 
-                                    }
-                                });
+                                return quizDetailsDataList;
+                            }
+                        });
 
-                            quizDetailsSubscritpionList.add(subscription);
-                        }
+                        Subscription subscription = z.subscribe(new Observer<List<QuizDetailsData>>() {
+                            @Override
+                            public void onCompleted() {
+
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+
+                            }
+
+                            @Override
+                            public void onNext(List<QuizDetailsData> quizDetailsDataList) {
+                                Log.d(TAG, "Start saving data");
+
+                                saveQuestionAndAnswerDataToDBAndUpdateQuizViewData(quizDBHelper, quizDetailsDataList);
+
+                                QuizRepositoryImpl quizRepository = new QuizRepositoryImpl(quizDBHelper);
+                                QuestionRepositoryImpl questionRepository = new QuestionRepositoryImpl(quizDBHelper);
+                                AnswerRepositoryImpl answerRepository = new AnswerRepositoryImpl((quizDBHelper));
+
+                                Log.d(TAG, String.valueOf(quizRepository.getAll().size()));
+                                Log.d(TAG, String.valueOf(questionRepository.getAll().size()));
+                                Log.d(TAG, String.valueOf(answerRepository.getAll().size()));
+
+                                Log.d(TAG, "End saving data");
+                            }
+                        });
+
+                        quizDetailsSubscritpionList.add(subscription);
 
                     }
+
                 });
     }
 
-    public List<QuizViewData> getQuizViewDataFromDb(QuizDBHelper quizDBHelper){
+    private void saveQuestionAndAnswerDataToDBAndUpdateQuizViewData(QuizDBHelper quizDBHelper, List<QuizDetailsData> quizDetailsDataList){
+        QuestionRepositoryImpl questionRepository = new QuestionRepositoryImpl(quizDBHelper);
+        AnswerRepositoryImpl answerRepository = new AnswerRepositoryImpl(quizDBHelper);
+
+        for(QuizDetailsData quizDetailsData : quizDetailsDataList){
+
+            Log.d("Quiz ", String.valueOf(quizDetailsData.getId()));
+
+            List<QuestionViewData> questionViewDataList = new ArrayList<>();
+
+            for(QuestionData questionData : quizDetailsData.getQuestions()){
+                Question question = new Question();
+                question.setQuizId(quizDetailsData.getId());
+                question.setText(questionData.getText());
+
+                long questionId = questionRepository.add(question);
+
+                Log.d("Question ", String.valueOf(questionId));
+
+                QuestionViewData questionViewData = new QuestionViewData();
+                questionViewData.setId(questionId);
+                questionViewData.setText(questionData.getText());
+
+                List<AnswerViewData> answerViewDataList = new ArrayList<>();
+
+                for(AnswerData answerData : questionData.getAnswers()){
+                    Answer answer = new Answer();
+                    answer.setQuestionId(questionId);
+                    answer.setCorrect(answerData.getCorrect());
+                    answer.setText(answerData.getText());
+
+                    long answerId = answerRepository.add(answer);
+                    Log.d("Answer ", String.valueOf(answerId));
+
+                    AnswerViewData answerViewData = new AnswerViewData();
+                    answerViewData.setId(answerId);
+                    answerViewData.setCorrect(answerData.getCorrect());
+                    answerViewData.setText(answerData.getText());
+                    answerViewDataList.add(answerViewData);
+                }
+
+                questionViewData.setAnswers(answerViewDataList);
+                questionViewDataList.add(questionViewData);
+            }
+
+            for(QuizViewData quizViewData : quizViewDataList){
+                if(quizViewData.getId().equals(quizDetailsData.getId())){
+                    quizViewData.setQuestions(questionViewDataList);
+                }
+            }
+        }
+
+    }
+
+    private List<QuizViewData> getQuizViewDataFromDb(QuizDBHelper quizDBHelper){
         List<QuizViewData> quizViewDataList = new ArrayList<QuizViewData>();
         List<Quiz> quizList = new ArrayList<Quiz>();
         List<Question> questionList = new ArrayList<Question>();
@@ -191,52 +289,6 @@ public class NetworkServiceManager {
         }
 
         return quizViewDataList;
-    }
-
-    private List<QuestionViewData> insertQuestionAndAnswerData(QuizDBHelper quizDBHelper, QuizDetailsData quizDetailsData){
-        List<QuestionViewData> questionViewDataList = new ArrayList<QuestionViewData>();
-
-        QuestionRepositoryImpl questionRepository = new QuestionRepositoryImpl(quizDBHelper);
-        AnswerRepositoryImpl answerRepository = new AnswerRepositoryImpl(quizDBHelper);
-
-        Log.d("Quiz ", String.valueOf(quizDetailsData.getId()));
-
-        for(QuestionData questionData : quizDetailsData.getQuestions()) {
-            Question question = new Question();
-            question.setText(questionData.getText());
-            question.setQuizId(quizDetailsData.getId());
-
-            long questionId = questionRepository.add(question);
-
-            Log.d("Add Question", String.valueOf(questionId));
-
-            QuestionViewData questionViewData = new QuestionViewData();
-            questionViewData.setId(questionId);
-            questionViewData.setText(questionData.getText());
-
-            List<AnswerViewData> answerViewDataList = new ArrayList<AnswerViewData>();
-            for (AnswerData answerData : questionData.getAnswers()) {
-                Answer answer = new Answer();
-                answer.setQuestionId(questionId);
-                answer.setCorrect(answerData.getCorrect());
-                answer.setText(answerData.getText());
-                Long answerId = answerRepository.add(answer);
-
-                Log.d("Add answer", String.valueOf(answerId));
-
-                AnswerViewData answerViewData = new AnswerViewData();
-                answerViewData.setId(answerId);
-                answerViewData.setCorrect(answerData.getCorrect());
-                answerViewData.setText(answerData.getText());
-
-                answerViewDataList.add(answerViewData);
-            }
-
-            questionViewData.setAnswers(answerViewDataList);
-            questionViewDataList.add(questionViewData);
-        }
-
-        return questionViewDataList;
     }
 
     private List<Quiz> getQuizListFromQuizzezData(QuizzesData quizzesData){
